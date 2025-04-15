@@ -53,7 +53,7 @@ public class SumTask extends RecursiveTask<Integer> {
         SumTask task = new SumTask(data, 0, data.length);
 
         long startTime1 = System.currentTimeMillis();
-        int result = pool.invoke(task);
+        int result = pool.invoke(task); // Inicia la tarea y espera su resultado.Internamente, maneja la ejecución de todas las subtareas.
         long endTime1 = System.currentTimeMillis();
 
         System.out.println("Resultado: " + result);
