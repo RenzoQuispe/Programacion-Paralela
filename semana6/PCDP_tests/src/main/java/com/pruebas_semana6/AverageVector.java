@@ -1,5 +1,5 @@
-package code;
-import edu.rice.pcdp.*;
+package com.pruebas_semana6;
+import edu.rice.pcdp.PCDP;
 public class AverageVector {
 	 int n;
 	 double[] myVal;

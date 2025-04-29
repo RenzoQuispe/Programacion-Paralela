@@ -1,13 +1,17 @@
-package code;
+package com.pruebas_semana6;
 
-
-import edu.rice.pcdp.*;
-import edu.rice.pcdp.runtime.*;
 import java.util.Random;
+
+import edu.rice.pcdp.PCDP;
+
+/*
+    villena@pcVillena:~/Escritorio/Renzo/Programacion Paralela/PCDP_tests$ mvn exec:java -Dexec.mainClass="com.pruebas_semana6.MatrixMultiplication"
+    villena@pcVillena:~/Escritorio/Renzo/Programacion Paralela/PCDP_tests$ mvn compile
+*/
+
 
 public class MatrixMultiplication {
 
-    
   private static void initializeMatrix(double[][] matrix) {
         Random rand = new Random();
         int n = matrix.length;
