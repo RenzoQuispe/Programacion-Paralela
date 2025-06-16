@@ -1,3 +1,0 @@
-Usa RecursiveTask<T> si tu tarea necesita calcular algo y devolver un valor.
-
-Usa RecursiveAction si tu tarea solo realiza una acción (como imprimir, guardar, modificar una estructura) y no necesita devolver nada.
