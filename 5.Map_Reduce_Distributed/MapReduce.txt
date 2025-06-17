@@ -4,14 +4,6 @@ MapReduce es un modelo de programación que permite procesar grandes cantidades 
 de forma eficiente y escalable. Este modelo divide el procesamiento en dos fases principales:
 - Map (Mapeo): transforma o convierte datos de entrada en pares clave-valor intermedios.
 - Reduce (Reducción): agrupa todos los valores que comparten la misma clave y los procesa para generar un conjunto reducido de resultados.
-Paralelismo: 
-MapReduce permite que múltiples tareas (map y reduce) se ejecuten simultáneamente. 
-Por ejemplo, los pares clave-valor generados durante la fase map se pueden procesar 
-en paralelo por distintos nodos o hilos, aprovechando al máximo los núcleos de la CPU o múltiples máquinas.
-Computación Distribuida: 
-MapReduce está diseñado para ejecutarse sobre un clúster de computadoras. 
-Cada nodo del clúster puede ejecutar una parte del trabajo (una función map o reduce) de manera independiente. 
-Al distribuir el procesamiento, se pueden analizar conjuntos de datos enormes que no cabrían en una sola máquina.
 
 La entrada a un cómputo estilo MapReduce es un conjunto de pares clave-valor. Las
 claves son similares a las utilizadas en las tablas hash, y el enfoque de programación
@@ -35,3 +27,49 @@ clave k, ésta pliega o reduce todos esos valores para obtener un único par cla
 de salida, (k, g(vA1,vB1, . . .)), para cada clave, k. en el conjunto clave-valor
 intermedio. Si es necesario, el conjunto de pares clave-valor de salida puede utilizarse
 entonces como entrada para un cálculo MapReduce sucesivo.
+
+Paralelismo: 
+MapReduce permite que múltiples tareas (map y reduce) se ejecuten simultáneamente. 
+Por ejemplo, los pares clave-valor generados durante la fase map se pueden procesar 
+en paralelo por distintos nodos o hilos, aprovechando al máximo los núcleos de la CPU o múltiples máquinas.
+
+Computación Distribuida: 
+MapReduce está diseñado para ejecutarse sobre un clúster de computadoras. 
+Cada nodo del clúster puede ejecutar una parte del trabajo (una función map o reduce) de manera independiente. 
+Al distribuir el procesamiento, se pueden analizar conjuntos de datos enormes que no cabrían en una sola máquina.
+
+
+
+No todos los procesos pueden ser abordados desde el framework MapReduce. 
+Concretamente son abordables solo aquellos que se pueden dividir en las operaciones de map() y de reduce() 
+y esto es importante a la hora de poder elegir este framework para resolver un problema. 
+Las funciones Map y Reduce están definidas ambas con respecto a datos estructurados en tuplas del tipo (clave, valor).
+
+Función Map()
+Map toma uno de estos pares de datos con un tipo en un dominio de datos, 
+y devuelve una lista de pares en un dominio diferente:
+    Map(k1,v1) -> list(k2,v2)
+Se encarga del mapeo y es aplicada en paralelo para cada ítem en la entrada de datos. 
+Esto produce una lista de pares (k2,v2) por cada llamada. 
+Después de eso, el framework de MapReduce junta todos los pares con la misma clave de todas las listas y los agrupa, 
+creando un grupo por cada una de las diferentes claves generadas.
+
+Función Reduce()
+La función reduce es aplicada en paralelo para cada grupo, produciendo una colección de valores para cada dominio:
+Reduce(k2, list (v2)) -> list(v3)
+Cada llamada a Reduce típicamente produce un valor v3 o una llamada vacía, aunque una llamada puede retornar más de un valor. 
+El retorno de todas esas llamadas se recoge como la lista de resultado deseado.
+Por lo tanto, el framework MapReduce transforma una lista de pares (clave, valor) en una lista de valores.
+
+Entrada: conjunto de pares (k, v)
+donde k es la clave y v es el valor asociado
+Mapeo: función definida por el usuario
+para cada (k, v) en la entrada:
+    emitir cero o más pares (k', v')
+Agrupacion: automática por el framework
+para cada clave k':
+    agrupar todos los valores v' asociados a esa k'
+    → obtener (k', [v1', v2', ..., vn'])
+Reduccion: función definida por el usuario
+para cada (k', [v1', v2', ..., vn']) agrupado:
+    emitir (k', resultado_final)
