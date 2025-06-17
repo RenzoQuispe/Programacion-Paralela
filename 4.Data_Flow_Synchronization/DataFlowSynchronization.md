@@ -7,3 +7,5 @@
 [3. Promedio iterativo unidimensional usando fáseres](./PromedioIterativo1D.java)
 
 [4. Paralelismo de canalizaciones usando fásers](./CanalizacionParalela.java)
+
+[5. Paralelismo del flujo de datos](./FlujoDeDatos.java)
