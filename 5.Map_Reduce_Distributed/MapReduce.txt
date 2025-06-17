@@ -1,0 +1,37 @@
+MAP-REDUCE
+
+MapReduce es un modelo de programación que permite procesar grandes cantidades de datos 
+de forma eficiente y escalable. Este modelo divide el procesamiento en dos fases principales:
+- Map (Mapeo): transforma o convierte datos de entrada en pares clave-valor intermedios.
+- Reduce (Reducción): agrupa todos los valores que comparten la misma clave y los procesa para generar un conjunto reducido de resultados.
+Paralelismo: 
+MapReduce permite que múltiples tareas (map y reduce) se ejecuten simultáneamente. 
+Por ejemplo, los pares clave-valor generados durante la fase map se pueden procesar 
+en paralelo por distintos nodos o hilos, aprovechando al máximo los núcleos de la CPU o múltiples máquinas.
+Computación Distribuida: 
+MapReduce está diseñado para ejecutarse sobre un clúster de computadoras. 
+Cada nodo del clúster puede ejecutar una parte del trabajo (una función map o reduce) de manera independiente. 
+Al distribuir el procesamiento, se pueden analizar conjuntos de datos enormes que no cabrían en una sola máquina.
+
+La entrada a un cómputo estilo MapReduce es un conjunto de pares clave-valor. Las
+claves son similares a las utilizadas en las tablas hash, y el enfoque de programación
+funcional requiere que tanto las claves como los valores sean inmutables. Cuando una
+función de mapa especificada por el usuario, f, se aplica sobre un par clave-valor,
+(kA,vA), da como resultado un conjunto (posiblemente vacío) de pares clave-valor de
+salida, {(kA1 ,vA1), (kA2, vA2),....} Esta función de mapa puede aplicarse en paralelo
+sobre todos los pares clave-valor del conjunto de entrada, para obtener un conjunto
+de pares clave-valor intermedio que sea la unión de todas las salidas.
+
+La siguiente operación realizada en el flujo de trabajo MapReduce se denomina
+agrupación, que agrupa todos los pares clave-valor intermedios con la misma clave.
+El agrupamiento lo realiza automáticamente el marco de trabajo MapReduce y no es
+necesario que lo especifique el programador. Por ejemplo, si hay dos pares clave-valor
+intermedios, (kA1 ,vA1) y (kB1 ,vB1) con la misma clave, kA1 = kB1 = k, entonces la
+salida de la agrupación asociará el conjunto de valores {vA1, vB1 } con la clave k.
+
+Por último, cuando se aplica una función de reducción especificada por el usuario, g,
+sobre dos o más valores agrupados (por ejemplo, vA1, vB1) asociados a la misma
+clave k, ésta pliega o reduce todos esos valores para obtener un único par clave-valor
+de salida, (k, g(vA1,vB1, . . .)), para cada clave, k. en el conjunto clave-valor
+intermedio. Si es necesario, el conjunto de pares clave-valor de salida puede utilizarse
+entonces como entrada para un cálculo MapReduce sucesivo.
