@@ -1,0 +1,3 @@
+Hello world
+Hello Hadoop
+Hadoop is fun

@@ -1,0 +1,92 @@
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Compile the Java code:
+javac -classpath `hadoop classpath` -d build src/WordCount.java
+
+
+Create a JAR:
+jar -cvf wordcount.jar -C build/ .
+
+Run on Hadoop:
+hdfs dfs -mkdir -p /user/yourname/input
+hdfs dfs -put input/sample.txt /user/yourname/input/
+
+hadoop jar wordcount.jar WordCount /user/yourname/input /user/yourname/output
+
+View output:
+hdfs dfs -cat /user/yourname/output/part-r-00000
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Step 1. Project Folder: MapReduceLab/
+This will contain:
+src/: Java source code for the WordCount MapReduce job.
+input/: Sample input text file.
+build/: This folder will hold the compiled Java class files.
+
+Strcuture
+MapReduceLab/
+├── src/
+│   └── WordCount.java
+├── input/
+│   └── sample.txt
+└── build/
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Step 2: Set up Docker-based Hadoop Environment
+The Docker setup allows students to avoid installing Hadoop directly on their local machines. This will simplify the process and ensure they get a uniform environment to run their code.
+1. Clone the Hadoop Docker repository
+git clone https://github.com/big-data-europe/docker-hadoop.git
+cd docker-hadoop
+This repository provides a pre-configured Docker setup for Hadoop.
+
+2. Build the Docker containers
+docker-compose build
+
+This will download the necessary images and build the Hadoop containers.
+
+3. Start Hadoop cluster with Docker
+Start Hadoop's master and worker containers:
+
+docker-compose up -d
+
+You should now have a 3-node Hadoop cluster running (1 master, 2 workers). You can check the status by running:
+docker ps
+4. Access Hadoop Web UI
+Resource Manager UI: http://localhost:8088
+NameNode UI: http://localhost:50070
+
+You can view logs and the status of your jobs via these web interfaces.
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Step 3: Upload Data to HDFS
+1, create the input directory in HDFS:
+
+docker exec -it hadoop-master bash
+hdfs dfs -mkdir -p /user/yourname/input
+
+2, Upload the sample text file to HDFS:
+hdfs dfs -put /path/to/MapReduceLab/input/sample.txt /user/yourname/input/
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Step 4: Compile and Run Your MapReduce Job
+1, Compile your WordCount Java file:
+javac -classpath `hadoop classpath` -d build src/WordCount.java
+
+2, Create the JAR file:
+jar -cvf wordcount.jar -C build/ .
+
+3, Run the WordCount job on Hadoop:
+hadoop jar wordcount.jar WordCount /user/yourname/input /user/yourname/output
+
+4, Check the output:
+hdfs dfs -cat /user/yourname/output/part-r-00000
+You should see the word counts, like:
+
+fun 1
+hadoop 2
+hello 2
+is 1
+world 1
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Step 5: 
+Exercises
+1, Stop Word Filtering: Modify the mapper to skip common stop words (like “the”, “is”, etc.).
+2, Case Sensitivity: Make word count case-sensitive.
+3, Punctuation Handling: Improve tokenizer to retain punctuation and count differently.Update the tokenizer to handle punctuation properly (counting "word!" and "word" as the same word).
+4, Sort by Frequency: Implement a custom reducer to output words sorted by frequency.
+5, Parallel Processing: Research and implement more advanced optimization techniques, such as combining multiple reducers to speed up the job.
