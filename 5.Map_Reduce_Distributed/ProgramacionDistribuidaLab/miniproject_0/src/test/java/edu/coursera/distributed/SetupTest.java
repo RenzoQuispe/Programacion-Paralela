@@ -1,14 +1,14 @@
 package edu.coursera.distributed;
 
-import java.util.Random;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
-
-public class SetupTest extends TestCase {
+public class SetupTest {
 
     /*
      * A simple test case.
      */
+    @Test
     public void testSetup() {
         final int result = Setup.setup(42);
         assertEquals(42, result);
