@@ -1,6 +1,12 @@
 package edu.coursera.distributed;
 
 import org.apache.spark.api.java.JavaRDD;
+
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
+
+
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
@@ -47,8 +53,40 @@ public final class PageRank {
      *         algorithm to update site ranks.
      */
     public static JavaPairRDD<Integer, Double> sparkPageRank(
-            final JavaPairRDD<Integer, Website> sites,
-            final JavaPairRDD<Integer, Double> ranks) {
-        throw new UnsupportedOperationException();
+        final JavaPairRDD<Integer, Website> sites,
+        final JavaPairRDD<Integer, Double> ranks) {
+
+        // Une ranks con sus sitios (A, (Website, rank))
+        JavaPairRDD<Integer, Tuple2<Website, Double>> joined = sites.join(ranks);
+
+        // Emite contribuciones (B, contribución) para cada destino B desde A
+        JavaPairRDD<Integer, Double> contributions = joined.flatMapToPair(site -> {
+            Integer siteId = site._1();
+            Website website = site._2()._1();
+            Double rank = site._2()._2();
+
+            int numEdges = website.getNEdges();
+            List<Tuple2<Integer, Double>> results = new ArrayList<>();
+
+            if (numEdges > 0) {
+                java.util.Iterator<Integer> iter = website.edgeIterator();
+                while (iter.hasNext()) {
+                    Integer target = iter.next();
+                    results.add(new Tuple2<>(target, rank / numEdges));
+                }
+            }
+
+            return results.iterator();
+        });
+
+        // Reduce: suma contribuciones entrantes por nodo destino
+        JavaPairRDD<Integer, Double> newRanks = contributions
+            .reduceByKey((a, b) -> a + b)
+            .mapValues(sum -> 0.15 + 0.85 * sum);
+
+        return newRanks;
     }
+
+
+
 }
