@@ -1,12 +1,10 @@
 package edu.coursera.distributed;
 
-import java.net.ServerSocket;
-import java.net.Socket;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.File;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * A basic and very limited implementation of a file server that responds to GET
@@ -25,48 +23,55 @@ public final class FileServer {
      *                     IOExceptions during normal operation.
      */
     public void run(final ServerSocket socket, final PCDPFilesystem fs)
-            throws IOException {
-        /*
-         * Enter a spin loop for handling client requests to the provided
-         * ServerSocket object.
-         */
+    throws IOException {
         while (true) {
+            // aceptar una nueva conexión de cliente
+            Socket clienteSocket = socket.accept();
+            // leemos la solicitud HTTP
+            InputStream input = clienteSocket.getInputStream();
+            OutputStream output = clienteSocket.getOutputStream();
+            // leemos la primera linea del request HTTP
+            StringBuilder requestBuilder = new StringBuilder();
+            int c;
+            while ((c = input.read()) != -1) {
+                requestBuilder.append((char) c);
+                if (requestBuilder.toString().endsWith("\r\n\r\n")) {
+                    break;
+                }
+            }
+            String request = requestBuilder.toString();
+            String[] lines = request.split("\r\n");
+            if (lines.length == 0 || !lines[0].startsWith("GET ")) {
+                clienteSocket.close();
+                continue;
+            }
+            // obtener la ruta del archivo solicitado
+            String firstLine = lines[0]; // GET /path/file.txt HTTP/1.1
+            String[] tokens = firstLine.split(" ");
+            if (tokens.length < 2) {
+                clienteSocket.close();
+                continue;
+            }
+            String path = tokens[1]; // "/path/file.txt"
+            PCDPPath pcdpPath = new PCDPPath(path);
 
-            // TODO Delete this once you start working on your solution.
-            throw new UnsupportedOperationException();
-
-            // TODO 1) Use socket.accept to get a Socket object
-
-            /*
-             * TODO 2) Using Socket.getInputStream(), parse the received HTTP
-             * packet. In particular, we are interested in confirming this
-             * message is a GET and parsing out the path to the file we are
-             * GETing. Recall that for GET HTTP packets, the first line of the
-             * received packet will look something like:
-             *
-             *     GET /path/to/file HTTP/1.1
-             */
-
-            /*
-             * TODO 3) Using the parsed path to the target file, construct an
-             * HTTP reply and write it to Socket.getOutputStream(). If the file
-             * exists, the HTTP reply should be formatted as follows:
-             *
-             *   HTTP/1.0 200 OK\r\n
-             *   Server: FileServer\r\n
-             *   \r\n
-             *   FILE CONTENTS HERE\r\n
-             *
-             * If the specified file does not exist, you should return a reply
-             * with an error code 404 Not Found. This reply should be formatted
-             * as:
-             *
-             *   HTTP/1.0 404 Not Found\r\n
-             *   Server: FileServer\r\n
-             *   \r\n
-             *
-             * Don't forget to close the output stream.
-             */
+            // leer archivo del sistema y preparar la respuesta HTTP
+            String contenido = fs.readFile(pcdpPath);
+            if (contenido != null) {
+                // respuesta 200 OK
+                String respuesta = "HTTP/1.0 200 OK\r\n" + "Server: FileServer\r\n" + "\r\n" + contenido;
+                output.write(respuesta.getBytes());
+            } else {
+                // respuesta 404 Not Found
+                String respuesta = "HTTP/1.0 404 Not Found\r\n" + "Server: FileServer\r\n" + "\r\n";
+                output.write(respuesta.getBytes());
+            }
+            // cerrar los recursos
+            output.close();
+            input.close();
+            clienteSocket.close();
         }
     }
+
+     
 }
